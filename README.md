@@ -1,6 +1,6 @@
 # SYS 6016 - Codeathon 3 - "There's an app for that"
 
-This small project is a weekly assignment for a Deep Learning class in my Master's program at [UVA School of Data Science](https://datascience.virginia.edu/).
+This small project is a weekly assignment for a Deep Learning class in my master's program at [UVA School of Data Science](https://datascience.virginia.edu/).
 
 Currently deployed at https://sys6016codeathon3.uk.r.appspot.com/
 
