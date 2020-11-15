@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <title>Datastore and Firebase Auth Example</title>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <h1>kf2tg - GCP Web app test</h1>
+
+  <h2>Name Generator</h2>
+
+  <form method="POST" action = "/">
+	<div class = "form-group">
+	Enter a letter: <input type="text" name = "name">
+	</div>
+	<input class="btn btn-primary" type="submit" value="submit">
+  </form>
+
+  <div style="width: 400px; margin: 0 auto; text-align: left">
+  {% for name in names %}
+    <p>{{ name }}</p>
+  {% endfor %}
+  </div>
+
+</body>
+</html>
