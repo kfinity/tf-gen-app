@@ -1,0 +1,67 @@
+# config set up
+
+export GOOGLE_APPLICATION_CREDENTIALS= (your local credential file location)
+gcloud config set project sys6016codeathon3
+export REGIONS="us-east4"
+export BUCKET_NAME="gs://codeathon3"
+export MODEL_NAME="namegen"
+export MODEL_DIR=$BUCKET_NAME/$MODEL_NAME
+export INPUT_FILE="input_a.json"
+export MODEL_VERSION="v1"
+
+# (in tensorflow, model.save('namegen'), then:
+# upload the SavedModel files to gcs
+gsutil cp -r namegen $BUCKET_NAME
+
+# test predictions locally with input file
+# a basic input json file just has 1 array of inputs per line, like [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
+gcloud ai-platform local predict --model-dir $MODEL_DIR \
+  --json-instances $INPUT_FILE \
+  --framework TENSORFLOW
+
+# create model stub
+gcloud ai-platform models create $MODEL_NAME --regions $REGIONS
+
+# deploy model
+gcloud ai-platform versions create $MODEL_VERSION \
+--model $MODEL_NAME \
+--origin $MODEL_DIR \
+--runtime-version 2.1 \
+--framework TENSORFLOW \
+--python-version 3.7
+
+# test the deployed model - should return same as local test, above
+# a basic input json file just has 1 array of inputs per line, like [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
+gcloud ai-platform predict \
+  --model $MODEL_NAME \
+  --version $MODEL_VERSION \
+  --json-instances $INPUT_FILE
+
+# Online prediction in Python:
+from google.api_core.client_options import ClientOptions
+from googleapiclient import discovery
+
+endpoint = 'https://us-east4-ml.googleapis.com'
+client_options = ClientOptions(api_endpoint=endpoint)
+ml = discovery.build('ml', 'v1', client_options=client_options)
+
+request_body = { 'instances': INSTANCES }
+request = ml.projects().predict(
+    name='projects/PROJECT_ID/models/MODEL_NAME/VERSION_NAME',
+    body=request_body)
+
+response = request.execute()
+print(response)
+
+
+# flask web app
+cd namegen-app
+pip install -r requirements.txt
+
+# run locally
+python main.py
+
+# deploy to GCP app engine
+gcloud app deploy
+gcloud app browse
+
